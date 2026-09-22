@@ -3,17 +3,21 @@
 اینجا محلی هست که پروژه سراسری تنظیم می‌شه (نه یک صفحه به‌خصوص).
 """
 
+import os
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# قبل از بردن سایت روی سرور، این کلید رو با یه متن تصادفی طولانی عوض کن.
-SECRET_KEY = "django-insecure-CHANGE-ME-before-deploy"
+# روی سرور، این مقدار رو از یه متغیر محیطی به اسم SECRET_KEY می‌خونه.
+# روی کامپیوتر خودت (وقتی اون متغیر رو تنظیم نکردی)، از همین مقدار پیش‌فرض استفاده می‌کنه.
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-CHANGE-ME-before-deploy")
 
-# روی کامپیوتر خودت True بذار. روی سرور واقعی حتماً False کن.
-DEBUG = True
+# روی کامپیوتر خودت True می‌مونه. روی سرور، متغیر محیطی DEBUG=False رو تنظیم می‌کنیم.
+DEBUG = os.environ.get("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+# روی سرور، آدرس سایتت رو با متغیر محیطی ALLOWED_HOSTS مشخص می‌کنیم (با کاما جدا اگه چندتا بود).
+_hosts = os.environ.get("ALLOWED_HOSTS", "127.0.0.1,localhost")
+ALLOWED_HOSTS = [h.strip() for h in _hosts.split(",") if h.strip()]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -27,6 +31,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # فایل‌های استاتیک رو روی سرور سرو می‌کنه
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -69,6 +74,12 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"  # جایی که collectstatic فایل‌ها رو جمع می‌کنه
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # عکس‌ها و فایل‌هایی که کاربر آپلود می‌کنه اینجا ذخیره می‌شن
 MEDIA_URL = "media/"
