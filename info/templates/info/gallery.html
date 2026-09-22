@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>گالری عکس</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#f5f6f8; --card:#fff; --ink:#1a1f2b; --muted:#667085; --line:#dfe3ea; --brand:#8a6d1f; --brand-dark:#6e5717; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font-family:"Vazirmatn", Tahoma, sans-serif; line-height:1.8; }
+    a { color: var(--brand); }
+    .wrap { max-width: 820px; margin: 0 auto; padding: 0 20px; }
+    header { background: linear-gradient(135deg,#1b1b1b,#3a3a3a); color:#fff; }
+    header .wrap { padding: 32px 20px; }
+    header h1 { margin:0 0 6px; font-size:1.8rem; font-weight:800; }
+    header a { color:#d8d8d8; text-decoration:none; }
+    main { padding: 32px 0 80px; }
+    section { margin-bottom: 36px; }
+    h2 { font-size:1.2rem; font-weight:800; margin:0 0 14px; border-right:4px solid var(--brand); padding-right:10px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px 20px; }
+    .field { margin-bottom: 14px; }
+    .field label { display:block; font-size:.9rem; color:var(--muted); margin-bottom:4px; }
+    .field input[type=text], .field input[type=file] {
+      font: inherit; width:100%; padding:9px 12px; border:1px solid var(--line); border-radius:8px;
+    }
+    button { font: inherit; font-weight:600; cursor:pointer; border:0; border-radius:8px;
+             padding:9px 18px; background:var(--brand); color:#fff; }
+    button:hover { background: var(--brand-dark); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:16px; }
+    .grid figure { margin:0; background:var(--card); border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+    .grid img { width:100%; aspect-ratio:4/3; object-fit:cover; display:block; }
+    .grid figcaption { padding:8px 10px; font-size:.9rem; }
+    .empty { text-align:center; padding:40px 20px; color:var(--muted); border:1px dashed var(--line); border-radius:10px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>گالری عکس</h1>
+      <a href="{% url 'home' %}">بازگشت به صفحه اصلی</a>
+    </div>
+  </header>
+  <main>
+    <div class="wrap">
+
+      <section>
+        <h2>آپلود عکس جدید</h2>
+        <form class="card" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="field">
+            <label for="id_title">عنوان (اختیاری)</label>
+            {{ form.title }}
+          </div>
+          <div class="field">
+            <label for="id_image">فایل عکس</label>
+            {{ form.image }}
+          </div>
+          <button type="submit">آپلود</button>
+        </form>
+      </section>
+
+      <section>
+        <h2>عکس‌ها</h2>
+        {% if photos %}
+          <div class="grid">
+            {% for photo in photos %}
+              <figure>
+                <img src="{{ photo.image.url }}" alt="{{ photo.title }}">
+                <figcaption>{{ photo.title|default:"بدون عنوان" }}</figcaption>
+              </figure>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty">هنوز عکسی آپلود نشده.</div>
+        {% endif %}
+      </section>
+
+    </div>
+  </main>
+</body>
+</html>
